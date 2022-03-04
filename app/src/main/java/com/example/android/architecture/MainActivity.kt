@@ -1,22 +1,62 @@
 package com.example.android.architecture
 
 import android.os.Bundle
+import android.view.View
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.content_main.*
 
 class MainActivity : AppCompatActivity() {
+    //This has a problem - you haven't loaded the layout file yet, so you
+    //don't actually have access to the die variables. ie: You're going to crash!
+    /***** private val imageViewsBad = arrayOf<ImageView>(die1, die2, die3, die4, die5) ******/
+
+    //This works since you don't instantiate until you need/use it - which is
+    //after the layout is fully loaded.
+    private val imageViews by lazy { arrayOf<ImageView>(die1, die2, die3, die4, die5) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
-        }
+        headline.text = savedInstanceState?.getString(HEADLINE_KEY) ?: "Empty"
 
+
+//        fab.setOnClickListener(fun(view: View) {
+//            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                .setAction("Action", null).show()
+//        })
+
+//        fab.setOnClickListener{ view ->
+//            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                .setAction("Action", null).show()
+//        }
+
+//        fab.setOnClickListener{view -> DoTheSnackBarStuff(view)}
+
+        //Used an explicit intent [cmd + return] to explicitly convert the
+        // explicit "view" parameter to 'it'
+        fab.setOnClickListener{ DoTheSnackBarStuff(it)}
+
+        lifecycle.addObserver(MyLifeCycleObserver())
+
+        //Makes all the dice images show the number 6.
+        for(imgVw in imageViews) {
+            imgVw.setImageResource(R.drawable.die_6)
+        }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString(HEADLINE_KEY, HEADLINE_TEXT)//Call before super
+
+        super.onSaveInstanceState(outState)
+    }
+
+    private fun DoTheSnackBarStuff(view: View) : Unit {
+        Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+            .setAction("Action", null).show()
+    }
 }
