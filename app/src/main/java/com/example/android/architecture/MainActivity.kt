@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
@@ -17,13 +19,23 @@ class MainActivity : AppCompatActivity() {
     //after the layout is fully loaded.
     private val imageViews by lazy { arrayOf<ImageView>(die1, die2, die3, die4, die5) }
 
+    private lateinit var vwMod : JeffsViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
+        //It returns a reference.
+        //Once we have this reference, we can store data within the view-model.
+        vwMod = ViewModelProvider(this).get(JeffsViewModel::class.java)
         headline.text = savedInstanceState?.getString(HEADLINE_KEY) ?: "Empty"
 
+        //Here we're just registering so that when the variable is updated, here's where we'll
+        //enter into the code to update our UI
+        vwMod.moreInfo.observe(this, Observer {
+            headline.text = it
+        })
 
 //        fab.setOnClickListener(fun(view: View) {
 //            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
